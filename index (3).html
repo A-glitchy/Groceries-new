@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f6f5e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><title>Grocery</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Grocery%20list%22%2C%22short_name%22%3A%22Grocery%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f6f5f1%22%2C%22theme_color%22%3A%22%232f6f5e%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage/svg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%253E%253Crect%20width%3D%27100%27%20height%3D%27100%27%20fill%3D%27%25232f6f5e%27/%253E%253Ctext%20x%3D%2750%27%20y%3D%2772%27%20font-size%3D%2760%27%20text-anchor%3D%27middle%27%253E%25F0%259F%259B%2592%253C/text%253E%253C/svg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image/svg%2Bxml%22%2C%22purpose%22%3A%22any%22%7D%5D%7D">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%92%3C/text%3E%3C/svg%3E">
+<style>
+:root{--lo:#1F6F54;--hi:#8A2F2F;--bg:#f6f5f1;--card:#fff;--tx:#1d2420;--mu:#79827c;--ac:#2f6f5e;--ln:#e6e4dd}
+@media(prefers-color-scheme:dark){:root{--bg:#141816;--card:#1e2421;--tx:#ecf0ed;--mu:#8f9a93;--ac:#5bb59c;--ln:#2d3430;--lo:#5bb59c;--hi:#e08a8a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.35 system-ui,sans-serif;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 14px 8px;z-index:5}
+h1{font-size:20px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+input,button{font:inherit;color:inherit}
+.in{width:100%;padding:10px 12px;border:1px solid var(--ln);border-radius:12px;background:var(--card)}
+.row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.tg{border:1px solid var(--ln);background:var(--card);padding:6px 12px;border-radius:99px;cursor:pointer}
+.tg.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{padding:4px 14px}
+.card{display:flex;gap:12px;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px;margin:8px 0;cursor:pointer}
+.ck{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--ac);background:none;margin-top:2px;cursor:pointer;color:#fff;font-size:15px;padding:0}
+.ck.on{background:var(--ac)}
+.mid{flex:1;min-width:0}.nm{font-size:16px}.nm.chk{text-decoration:line-through;color:var(--mu)}
+small,.mu{color:var(--mu);font-size:12.5px}
+.rt{text-align:right;flex:none}.pr{font-weight:600;white-space:nowrap}
+.chip{display:inline-block;margin-top:6px;padding:3px 9px;border-radius:99px;background:var(--bg);border:1px dashed var(--ln);font-size:12.5px;color:var(--mu)}
+.chip.has{border-style:solid;color:var(--tx)}
+.lo{color:var(--lo)}.hi{color:var(--hi)}.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;white-space:nowrap}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;padding:14px 0;border:0;background:none;color:var(--mu);font-weight:600}
+nav button.on{color:var(--ac)}
+.sh{position:fixed;inset:0;background:#0006;display:flex;align-items:flex-end;z-index:10}
+.sh>div{background:var(--card);width:100%;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto}
+.btn{padding:11px 16px;border-radius:12px;border:1px solid var(--ln);background:var(--card);cursor:pointer}
+.btn.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.qty{display:flex;align-items:center;gap:14px;font-size:20px;margin:10px 0}
+.qty button{width:40px;height:40px;border-radius:50%;border:1px solid var(--ln);background:var(--bg);font-size:20px}
+.tb{width:100%;border-collapse:collapse;font-size:13.5px}.tb td,.tb th{padding:8px 6px;border-bottom:1px solid var(--ln);text-align:left;vertical-align:top}
+.sc{overflow-x:auto}.hrow{padding:10px 0;border-bottom:1px solid var(--ln)}
+.hrow .t{display:flex;justify-content:space-between;gap:8px}
+.dc{color:#c0562f;font-size:12px;font-weight:600}
+</style></head><body>
+<header><h1><span id="ttl">Grocery list</span><span><button class="tg" id="pend" hidden></button> <button class="tg" id="add">＋</button> <button class="tg" id="gear">⚙︎</button></span></h1><div id="ctl"></div></header>
+<main id="app"></main><div id="shw"></div>
+<nav><button data-t="list">List</button><button data-t="prices">Prices</button><button data-t="hist">History</button></nav>
+<script>
+const LS=localStorage,$=s=>document.querySelector(s);
+const J=(k,d)=>{try{return JSON.parse(LS.getItem(k))??d}catch{return d}};
+let cfg=J('cfg',{m:'',o:''}),loc=J('loc',{}),raw=J('raw',{m:'',o:''}),synced=LS.getItem('synced')||'',msg='';
+let pend=J('pend',[]),fl='all',so='az',tab='list',q='',hq='',hprod='',disc=false,onlyPar=false,D={items:[],M:[]};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+function csv(t){const r=[];let w=[],c='',qt=false;for(let i=0;i<t.length;i++){const h=t[i];if(qt){if(h=='"'){if(t[i+1]=='"'){c+='"';i++}else qt=false}else c+=h}else if(h=='"')qt=true;else if(h==','){w.push(c);c=''}else if(h=='\n'||h=='\r'){if(h=='\r'&&t[i+1]=='\n')i++;w.push(c);r.push(w);w=[];c=''}else c+=h}if(c||w.length){w.push(c);r.push(w)}return r}
+function rows(t){const r=csv(t||'');if(!r.length)return[];const h=r[0].map(x=>x.trim());return r.slice(1).filter(x=>x[0]&&x[0].trim()).map(x=>Object.fromEntries(h.map((k,i)=>[k,(x[i]||'').trim()])))}
+const U={g:['kg',1000],ml:['L',1000],kg:['kg',1],piece:['each',1],egg:['egg',1],roll:['roll',1],l:['L',1],L:['L',1]};
+const up=(p,q,u)=>{const x=U[u]||[u||'unit',1];return{v:p/q*x[1],l:x[0]}};
+const cmp=(a,b)=>a.d<b.d?-1:a.d>b.d?1:a.i-b.i;
+function build(){
+ const M=rows(raw.m).map((r,i)=>({i,p:r.Product,key:r.Product.toLowerCase(),b:r.Brand,s:r['Purchased at (store)'],d:r['Date purchased'],pr:+r['Price paid (toman)'],q:+r['Pack qty']||1,u:(r['Pack unit']||'').toLowerCase(),disc:/^y/i.test(r['Discounted?']),par:/^true$/i.test(r['For parents']),n:r.Notes})).filter(r=>r.pr>0);
+ const O=rows(raw.o).map((r,i)=>({i,key:r.Product.toLowerCase(),s:r.Store,d:r['Date checked'],pr:+r['Price (toman)'],q:+r['Pack qty']||1,u:(r['Pack unit']||'').toLowerCase()})).filter(r=>r.pr>0);
+ const sig=(k,s,d,p)=>[k,s,d,p].map(v=>String(v??'').toLowerCase().trim()).join('|');
+ if(M.length){const S=new Set([...M.map(r=>sig(r.key,r.s,r.d,r.pr)),...O.map(r=>sig(r.key,r.s,r.d,r.pr))]);const n=pend.length;pend=pend.filter(p=>!S.has(sig(p.r.p.toLowerCase(),p.r.s,p.r.d,p.r.pr)));if(pend.length!=n)LS.setItem('pend',JSON.stringify(pend))}
+ pend.forEach((p,j)=>{const r=p.r,k=r.p.toLowerCase();if(p.t=='m')M.push({i:1e6+j,p:r.p,key:k,b:r.b,s:r.s,d:r.d,pr:r.pr,q:r.q,u:r.u,disc:!!r.disc,par:!!r.par,n:r.n,pend:1});else O.push({i:1e6+j,key:k,s:r.s,d:r.d,pr:r.pr,q:r.q,u:r.u})});
+ const g={};M.forEach(r=>(g[r.key]=g[r.key]||{key:r.key,name:r.p,rows:[]}).rows.push(r));
+ const items=Object.values(g);
+ items.forEach(x=>{x.rows.sort(cmp);x.last=x.rows.at(-1);const pr=x.rows.map(r=>r.pr);x.lo=Math.min(...pr);x.hi=Math.max(...pr);
+  const ps=x.rows.filter(r=>r.u==x.last.u).map(r=>up(r.pr,r.q,r.u));x.pu=ps.reduce((a,b)=>b.v<a.v?b:a);
+  x.par=x.rows.some(r=>r.par);const o=O.filter(r=>r.key==x.key).sort(cmp).at(-1);
+  x.on=o?{...o,pu:up(o.pr,o.q,o.u)}:null});
+ items.sort((a,b)=>a.name.localeCompare(b.name));D={items,M,O};
+}
+const L=k=>loc[k]||{};
+const isPar=x=>L(x.key).par??x.par;
+function save(){LS.setItem('loc',JSON.stringify(loc))}
+function pill(s){s=(s||'').trim();if(!s)return'<span class="pill" style="background:#8883;color:var(--mu)">Unknown</span>';let h=0;for(const c of s.toLowerCase())h=(h*31+c.charCodeAt(0))%360;return`<span class="pill" style="background:hsl(${h} 70% 88%);color:hsl(${h} 55% 28%)">${esc(s)}</span>`}
+function ctl(){let h='';
+ if(tab=='list'){const N=D.items.length,n=D.items.filter(x=>L(x.key).ck).length;
+ h=`<input class="in" id="q" placeholder="Search list" value="${esc(q)}"><div class="row">${[['all','All'],['todo','To buy'],['done','Got it']].map(([k,t])=>`<button class="tg ${fl==k?'on':''}" data-fl="${k}">${t}</button>`).join('')}<button class="tg ${onlyPar?'on':''}" id="par">Parents</button></div><div class="row"><select class="tg" id="so">${[['az','A–Z'],['lo','Lowest price'],['hi','Highest price'],['new','Recently bought']].map(([k,t])=>`<option value="${k}" ${so==k?'selected':''}>Sort: ${t}</option>`).join('')}</select><span class="mu">${n}/${N} got it</span><button class="tg" id="clr">Clear ticks</button></div>`}
+ if(tab=='hist')h=`<input class="in" id="hq" placeholder="Search purchase history" value="${esc(hq)}"><div class="row"><button class="tg ${disc?'on':''}" id="dc">${disc?'Discounted':'Full price'}</button>${hprod?`<button class="tg" id="hp">${esc(hprod)} ✕</button>`:''}</div>`;
+ $('#ctl').innerHTML=h;$('#ttl').textContent={list:'Grocery list',prices:'Prices',hist:'Purchase history'}[tab];
+ $('#pend').hidden=!pend.length;$('#pend').textContent='📋 '+pend.length;
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
+function list(){const s=q.toLowerCase();
+ const a=D.items.filter(x=>(!s||x.name.toLowerCase().includes(s))&&(!onlyPar||isPar(x))&&(fl=='all'||(fl=='done')==!!L(x.key).ck));
+ a.sort({az:(a,b)=>a.name.localeCompare(b.name),lo:(a,b)=>a.lo-b.lo,hi:(a,b)=>b.hi-a.hi,new:(a,b)=>cmp(b.last,a.last)}[so]);
+ return a.map(x=>{const l=L(x.key),qn=l.qty||0;
+ return`<div class="card" data-open="${esc(x.key)}"><button class="ck ${l.ck?'on':''}" data-ck="${esc(x.key)}">${l.ck?'✓':''}</button>
+ <div class="mid"><div class="nm ${l.ck?'chk':''}">${esc(x.name)}${isPar(x)?' <small>· parents</small>':''}</div>${x.last.b?`<small>${esc(x.last.b)}</small>`:''}
+ <div><span class="chip ${qn||l.note?'has':''}" data-ed="${esc(x.key)}">${qn||l.note?`×${qn||1}${l.note?' · '+esc(l.note):''}`:'+ qty / note'}</span></div></div>
+ <div class="rt"><div class="pr"><span class="lo">${fmt(x.lo)}</span> | <span class="hi">${fmt(x.hi)}</span></div><small>${fmt(x.pu.v)} / ${x.pu.l}</small></div></div>`}).join('')||'<p class="mu">Nothing here.</p>'}
+function prices(){return`<div class="sc"><table class="tb"><tr><th>Product</th><th>Low | High</th><th>Best / unit</th><th>Online (checked)</th></tr>${D.items.map(x=>`<tr><td>${esc(x.name)}</td><td><span class="lo">${fmt(x.lo)}</span> | <span class="hi">${fmt(x.hi)}</span></td><td>${fmt(x.pu.v)}<br><small>per ${x.pu.l}</small></td><td>${x.on?`${fmt(x.on.pr)}<br><small>${fmt(x.on.pu.v)} / ${x.on.pu.l}<br>${esc(x.on.d)}${x.on.s?' · '+esc(x.on.s):''}</small>`:'<small>not checked</small>'}</td></tr>`).join('')}</table></div>`}
+function hist(){const s=hq.toLowerCase();
+ const r=D.M.filter(r=>r.disc==disc&&(!hprod||r.key==hprod.toLowerCase())&&(!s||[r.p,r.b,r.s,r.n,r.d].join(' ').toLowerCase().includes(s))).sort((a,b)=>cmp(b,a));
+ return r.map(r=>{const p=up(r.pr,r.q,r.u);return`<div class="hrow"><div class="t"><b>${esc(r.p)}</b><b>${fmt(r.pr)}</b></div><div class="t"><small>${esc(r.d)} · ${r.q} ${esc(r.u)}${r.b?' · '+esc(r.b):''}</small><small>${fmt(p.v)} / ${p.l}</small></div><div class="t" style="margin-top:4px">${pill(r.s)}${r.disc?'<span class="dc">discounted</span>':''}${r.pend?'<span class="dc">not in sheet yet</span>':''}</div>${r.n?`<small>${esc(r.n)}</small>`:''}</div>`}).join('')||'<p class="mu">No purchases match.</p>'}
+function render(){ctl();$('#app').innerHTML={list,prices,hist}[tab]()}
+function sheet(h){$('#shw').innerHTML=h?`<div class="sh" id="bg"><div>${h}</div></div>`:''}
+function edit(k){const x=D.items.find(i=>i.key==k),l=L(k);
+ sheet(`<h3 style="margin:0">${esc(x.name)}</h3><div class="qty"><button id="mn">−</button><b id="qv">${l.qty||0}</b><button id="pl">+</button><span class="mu">needed</span></div>
+ <input class="in" id="nt" placeholder="Note (brand, size, where…)" value="${esc(l.note||'')}"><div class="row"><button class="tg ${isPar(x)?'on':''}" id="pt">For parents</button></div>
+ <div class="row" style="margin-top:16px"><button class="btn p" id="dn">Done</button><button class="btn" id="vh">Purchase history →</button></div><div class="row"><button class="btn" id="ap">+ purchase</button><button class="btn" id="ao">+ online price</button></div>`);
+ const pf={p:x.name,b:x.last.b,s:x.last.s,q:x.last.q,u:x.last.u};$('#ap').onclick=()=>addForm('m',pf);$('#ao').onclick=()=>addForm('o',pf);
+ const set=(o)=>{loc[k]={...L(k),...o};save()};
+ $('#mn').onclick=()=>{const v=Math.max(0,(L(k).qty||0)-1);set({qty:v});$('#qv').textContent=v};
+ $('#pl').onclick=()=>{const v=(L(k).qty||0)+1;set({qty:v});$('#qv').textContent=v};
+ $('#nt').oninput=e=>set({note:e.target.value});
+ $('#pt').onclick=e=>{set({par:!isPar(x)});e.target.classList.toggle('on',isPar(x))};
+ $('#dn').onclick=()=>{sheet('');render()};
+ $('#vh').onclick=()=>{sheet('');openHist(x.name)}}
+function openHist(n){hprod=n;hq='';disc=false;tab='hist';render();scrollTo(0,0)}
+const nd=s=>String(s||'').replace(/[۰-۹]/g,c=>c.charCodeAt(0)-1776).replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632).trim();
+function today(){const p=new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()),g=t=>p.find(x=>x.type==t).value;return g('year')+'/'+g('month')+'/'+g('day')}
+const uniq=a=>{const m={};a.filter(Boolean).forEach(v=>m[v.toLowerCase()]=m[v.toLowerCase()]||v);return Object.values(m)};
+function chooser(){sheet(`<h3 style="margin:0 0 10px">Add</h3><div class="row"><button class="btn p" id="c1">Purchase</button><button class="btn p" id="c2">Online price</button><button class="btn" id="c3">Cancel</button></div>`);$('#c1').onclick=()=>addForm('m');$('#c2').onclick=()=>addForm('o');$('#c3').onclick=()=>sheet('')}
+function addForm(t,pf={}){let dc=false,pa=false;const opt=a=>a.map(v=>`<option value="${esc(v)}">`).join('');
+ const v=k=>esc(pf[k]??'');
+ sheet(`<h3 style="margin:0 0 8px">${t=='m'?'Add purchase':'Add online price'}</h3>
+ <input class="in" id="fp" list="dlp" placeholder="Product" value="${v('p')}"><datalist id="dlp">${opt(D.items.map(x=>x.name))}</datalist>
+ <div class="row"><input class="in" id="fb" placeholder="Brand" value="${v('b')}" style="flex:1;min-width:40%"><input class="in" id="fs" list="dls" placeholder="Store" value="${v('s')}" style="flex:1;min-width:40%"></div><datalist id="dls">${opt(uniq(D.M.map(r=>r.s)))}</datalist>
+ <div class="row"><input class="in" id="fd" value="${today()}" style="flex:1;min-width:40%"><input class="in" id="fr" inputmode="decimal" placeholder="Price (toman)" style="flex:1;min-width:40%"></div>
+ <div class="row"><input class="in" id="fq" inputmode="decimal" placeholder="Pack qty" value="${v('q')}" style="flex:1;min-width:40%"><input class="in" id="fu" list="dlu" placeholder="Unit (g, ml, piece…)" value="${v('u')}" style="flex:1;min-width:40%"></div><datalist id="dlu">${opt(uniq([...D.M.map(r=>r.u),'g','kg','ml','L','piece','egg','roll']))}</datalist>
+ ${t=='m'?'<div class="row"><button class="tg" id="fdc">Discounted</button><button class="tg" id="fpa">For parents</button></div><input class="in" id="fn" placeholder="Note" style="margin-top:8px">':''}
+ <p class="mu" id="er" style="color:var(--hi)"></p><div class="row"><button class="btn p" id="fsv">Save</button><button class="btn" id="fcn">Cancel</button></div>`);
+ if(t=='m'){$('#fdc').onclick=e=>{dc=!dc;e.target.classList.toggle('on',dc)};$('#fpa').onclick=e=>{pa=!pa;e.target.classList.toggle('on',pa)}}
+ $('#fcn').onclick=()=>sheet('');
+ $('#fsv').onclick=()=>{const r={p:$('#fp').value.trim(),b:$('#fb').value.trim(),s:$('#fs').value.trim(),d:nd($('#fd').value),pr:+nd($('#fr').value),q:+nd($('#fq').value)||1,u:$('#fu').value.trim()};
+  if(!r.p||!(r.pr>0)||!r.d){$('#er').textContent='Product, date and a price are needed.';return}
+  const e=D.items.find(x=>x.key==r.p.toLowerCase());if(e)r.p=e.name;
+  if(t=='m'){r.disc=dc;r.par=pa;r.n=$('#fn').value.trim()}
+  pend.push({t,r});LS.setItem('pend',JSON.stringify(pend));sheet('');build();render()}}
+function tsv(t){const f='=INDIRECT("E"&ROW())/INDIRECT("F"&ROW())';return pend.filter(p=>p.t==t).map(({r})=>(t=='m'?[r.p,r.b,r.s,r.d,r.pr,r.q,r.u,f,r.disc?'Yes':'',r.par?'TRUE':'FALSE',r.n]:[r.p,r.b,r.s,r.d,r.pr,r.q,r.u,f]).map(v=>v??'').join('\t')).join('\n')}
+function settings(){sheet(`${pend.length?`<h3 style="margin:0 0 6px">Not in the sheet yet (${pend.length})</h3><small>Copy, then paste into the first empty row of the matching tab. They disappear here once the sheet has them.</small><div class="row"><button class="btn" data-cp="m">Copy purchases (${pend.filter(p=>p.t=='m').length})</button><button class="btn" data-cp="o">Copy online prices (${pend.filter(p=>p.t=='o').length})</button></div><textarea class="in" id="cpt" rows="4" readonly hidden></textarea><div class="row"><button class="btn" id="cpx">Remove all pending</button></div><hr style="border:0;border-top:1px solid var(--ln);margin:14px 0">`:''}<h3 style="margin:0 0 8px">Sheet connection</h3><small>Paste the "published CSV" links. They stay on this device.</small>
+ <p class="mu" style="margin-bottom:4px">Master_Log link</p><input class="in" id="cm" value="${esc(cfg.m)}">
+ <p class="mu" style="margin-bottom:4px">Online_Prices link</p><input class="in" id="co" value="${esc(cfg.o)}">
+ <div class="row" style="margin-top:14px"><button class="btn p" id="sv">Save &amp; sync</button><button class="btn" id="cl">Close</button></div>
+ <p class="mu">${esc(msg)} ${synced?'Last sync: '+esc(synced):''}</p>
+ <p class="mu" style="margin-bottom:4px">Or import CSV files manually (works offline)</p>
+ <div class="row"><label class="btn">Master_Log<input type="file" accept=".csv" hidden data-imp="m"></label><label class="btn">Online_Prices<input type="file" accept=".csv" hidden data-imp="o"></label></div>`);
+ $('#sv').onclick=async()=>{cfg={m:$('#cm').value.trim(),o:$('#co').value.trim()};LS.setItem('cfg',JSON.stringify(cfg));await sync();settings()};
+ $('#cl').onclick=()=>sheet('');
+ document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=async()=>{const x=tsv(b.dataset.cp);try{await navigator.clipboard.writeText(x);b.textContent='Copied ✓'}catch{const t=$('#cpt');t.hidden=false;t.value=x;t.select()}});
+ if($('#cpx'))$('#cpx').onclick=()=>{if(confirm('Remove all entries not yet in the sheet?')){pend=[];LS.setItem('pend','[]');build();render();settings()}};
+ document.querySelectorAll('[data-imp]').forEach(i=>i.onchange=async e=>{const f=e.target.files[0];if(!f)return;raw[i.dataset.imp]=await f.text();LS.setItem('raw',JSON.stringify(raw));msg='Imported '+f.name;build();render();settings()})}
+async function sync(){if(!cfg.m)return;
+ try{const get=u=>fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()});
+  const[m,o]=await Promise.all([get(cfg.m),cfg.o?get(cfg.o):raw.o]);raw={m,o};LS.setItem('raw',JSON.stringify(raw));
+  synced=new Date().toLocaleString();LS.setItem('synced',synced);msg='Synced.'}catch(e){msg='Could not reach the sheet ('+(location.protocol=='file:'?'opened as a local file; ':'')+(e&&e.message||e)+'). Showing saved data.'}
+ build();render()}
+document.addEventListener('click',e=>{const t=e.target;
+ if(t.id=='bg'){sheet('');return}
+ const ck=t.closest('[data-ck]');if(ck){e.stopPropagation();const k=ck.dataset.ck;loc[k]={...L(k),ck:!L(k).ck};save();render();return}
+ const ed=t.closest('[data-ed]');if(ed){edit(ed.dataset.ed);return}
+ const op=t.closest('[data-open]');if(op){openHist(D.items.find(i=>i.key==op.dataset.open).name);return}
+ const tb=t.closest('nav button');if(tb){tab=tb.dataset.t;render();scrollTo(0,0);return}
+ if(t.id=='gear'||t.id=='pend')settings();
+ if(t.id=='add')chooser();
+ const f=t.closest('[data-fl]');if(f){fl=f.dataset.fl;render()}
+ if(t.id=='par'){onlyPar=!onlyPar;render()}
+ if(t.id=='dc'){disc=!disc;render()}
+ if(t.id=='hp'){hprod='';render()}
+ if(t.id=='clr'&&confirm('Uncheck everything?')){Object.keys(loc).forEach(k=>delete loc[k].ck);save();render()}});
+document.addEventListener('change',e=>{if(e.target.id=='so'){so=e.target.value;render()}});
+document.addEventListener('input',e=>{const t=e.target;
+ if(t.id=='q'||t.id=='hq'){const p=t.selectionStart;t.id=='q'?q=t.value:hq=t.value;$('#app').innerHTML={list,hist}[tab]();}});
+build();render();sync();addEventListener('online',sync);
+if(!cfg.m&&!raw.m)settings();
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
