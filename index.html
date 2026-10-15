@@ -24,7 +24,7 @@ small,.mu{color:var(--mu);font-size:12.5px}
 .rt{text-align:right;flex:none}.pr{font-weight:600;white-space:nowrap}
 .chip{display:inline-block;margin-top:6px;padding:3px 9px;border-radius:99px;background:var(--bg);border:1px dashed var(--ln);font-size:12.5px;color:var(--mu)}
 .chip.has{border-style:solid;color:var(--tx)}
-.lo{color:var(--lo)}.hi{color:var(--hi)}.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;white-space:nowrap}
+.lo{color:var(--lo)}.hi{color:var(--hi)}.sec{font-size:15px;margin:18px 0 4px}.fp{color:var(--mu);font-size:12px}.tb tr[data-open]{cursor:pointer}.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;white-space:nowrap}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom)}
 nav button{flex:1;padding:14px 0;border:0;background:none;color:var(--mu);font-weight:600}
 nav button.on{color:var(--ac)}
@@ -46,7 +46,7 @@ nav button.on{color:var(--ac)}
 const LS=localStorage,$=s=>document.querySelector(s);
 const J=(k,d)=>{try{return JSON.parse(LS.getItem(k))??d}catch{return d}};
 let cfg=J('cfg',{m:'',o:''}),loc=J('loc',{}),raw=J('raw',{m:'',o:''}),synced=LS.getItem('synced')||'',msg='';
-let pend=J('pend',[]),fl='all',so='az',tab='list',q='',hq='',hprod='',disc=false,onlyPar=false,D={items:[],M:[]};
+let pend=J('pend',[]),fl='all',so='az',pq='',tab='list',q='',hq='',hprod='',disc=false,onlyPar=false,D={items:[],M:[]};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=n=>Math.round(n).toLocaleString('en-US');
 function csv(t){const r=[];let w=[],c='',qt=false;for(let i=0;i<t.length;i++){const h=t[i];if(qt){if(h=='"'){if(t[i+1]=='"'){c+='"';i++}else qt=false}else c+=h}else if(h=='"')qt=true;else if(h==','){w.push(c);c=''}else if(h=='\n'||h=='\r'){if(h=='\r'&&t[i+1]=='\n')i++;w.push(c);r.push(w);w=[];c=''}else c+=h}if(c||w.length){w.push(c);r.push(w)}return r}
@@ -56,10 +56,10 @@ const up=(p,q,u)=>{const x=U[u]||[u||'unit',1];return{v:p/q*x[1],l:x[0]}};
 const cmp=(a,b)=>a.d<b.d?-1:a.d>b.d?1:a.i-b.i;
 function build(){
  const M=rows(raw.m).map((r,i)=>({i,p:r.Product,key:r.Product.toLowerCase(),b:r.Brand,s:r['Purchased at (store)'],d:r['Date purchased'],pr:+r['Price paid (toman)'],q:+r['Pack qty']||1,u:(r['Pack unit']||'').toLowerCase(),disc:/^y/i.test(r['Discounted?']),par:/^true$/i.test(r['For parents']),n:r.Notes})).filter(r=>r.pr>0);
- const O=rows(raw.o).map((r,i)=>({i,key:r.Product.toLowerCase(),s:r.Store,d:r['Date checked'],pr:+r['Price (toman)'],q:+r['Pack qty']||1,u:(r['Pack unit']||'').toLowerCase()})).filter(r=>r.pr>0);
+ const O=rows(raw.o).map((r,i)=>({i,p:r.Product,b:r.Brand,key:r.Product.toLowerCase(),s:r.Store,d:r['Date checked'],pr:+r['Price (toman)'],q:+r['Pack qty']||1,u:(r['Pack unit']||'').toLowerCase()})).filter(r=>r.pr>0);
  const sig=(k,s,d,p)=>[k,s,d,p].map(v=>String(v??'').toLowerCase().trim()).join('|');
  if(M.length){const S=new Set([...M.map(r=>sig(r.key,r.s,r.d,r.pr)),...O.map(r=>sig(r.key,r.s,r.d,r.pr))]);const n=pend.length;pend=pend.filter(p=>!S.has(sig(p.r.p.toLowerCase(),p.r.s,p.r.d,p.r.pr)));if(pend.length!=n)LS.setItem('pend',JSON.stringify(pend))}
- pend.forEach((p,j)=>{const r=p.r,k=r.p.toLowerCase();if(p.t=='m')M.push({i:1e6+j,p:r.p,key:k,b:r.b,s:r.s,d:r.d,pr:r.pr,q:r.q,u:r.u,disc:!!r.disc,par:!!r.par,n:r.n,pend:1});else O.push({i:1e6+j,key:k,s:r.s,d:r.d,pr:r.pr,q:r.q,u:r.u})});
+ pend.forEach((p,j)=>{const r=p.r,k=r.p.toLowerCase();if(p.t=='m')M.push({i:1e6+j,p:r.p,key:k,b:r.b,s:r.s,d:r.d,pr:r.pr,q:r.q,u:r.u,disc:!!r.disc,par:!!r.par,n:r.n,pend:1});else O.push({i:1e6+j,p:r.p,b:r.b,pend:1,key:k,s:r.s,d:r.d,pr:r.pr,q:r.q,u:r.u})});
  const g={};M.forEach(r=>(g[r.key]=g[r.key]||{key:r.key,name:r.p,rows:[]}).rows.push(r));
  const items=Object.values(g);
  items.forEach(x=>{x.rows.sort(cmp);x.last=x.rows.at(-1);const pr=x.rows.map(r=>r.pr);x.lo=Math.min(...pr);x.hi=Math.max(...pr);
@@ -75,7 +75,8 @@ function pill(s){s=(s||'').trim();if(!s)return'<span class="pill" style="backgro
 function ctl(){let h='';
  if(tab=='list'){const N=D.items.length,n=D.items.filter(x=>L(x.key).ck).length;
  h=`<input class="in" id="q" placeholder="Search list" value="${esc(q)}"><div class="row">${[['all','All'],['todo','To buy'],['done','Got it']].map(([k,t])=>`<button class="tg ${fl==k?'on':''}" data-fl="${k}">${t}</button>`).join('')}<button class="tg ${onlyPar?'on':''}" id="par">Parents</button></div><div class="row"><select class="tg" id="so">${[['az','A–Z'],['lo','Lowest price'],['hi','Highest price'],['new','Recently bought']].map(([k,t])=>`<option value="${k}" ${so==k?'selected':''}>Sort: ${t}</option>`).join('')}</select><span class="mu">${n}/${N} got it</span><button class="tg" id="clr">Clear ticks</button></div>`}
- if(tab=='hist')h=`<input class="in" id="hq" placeholder="Search purchase history" value="${esc(hq)}"><div class="row"><button class="tg ${disc?'on':''}" id="dc">${disc?'Discounted':'Full price'}</button>${hprod?`<button class="tg" id="hp">${esc(hprod)} ✕</button>`:''}</div>`;
+ if(tab=='prices')h=`<input class="in" id="pq" placeholder="Search products" value="${esc(pq)}">`;
+ if(tab=='hist')h=`<input class="in" id="hq" placeholder="Search purchase history" value="${esc(hq)}">${hprod?`<div class="row"><button class="tg" id="hp">${esc(hprod)} ✕</button></div>`:''}`;
  $('#ctl').innerHTML=h;$('#ttl').textContent={list:'Grocery list',prices:'Prices',hist:'Purchase history'}[tab];
  $('#pend').hidden=!pend.length;$('#pend').textContent='📋 '+pend.length;
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
@@ -87,10 +88,15 @@ function list(){const s=q.toLowerCase();
  <div class="mid"><div class="nm ${l.ck?'chk':''}">${esc(x.name)}${isPar(x)?' <small>· parents</small>':''}</div>${x.last.b?`<small>${esc(x.last.b)}</small>`:''}
  <div><span class="chip ${qn||l.note?'has':''}" data-ed="${esc(x.key)}">${qn||l.note?`×${qn||1}${l.note?' · '+esc(l.note):''}`:'+ qty / note'}</span></div></div>
  <div class="rt"><div class="pr"><span class="lo">${fmt(x.lo)}</span> | <span class="hi">${fmt(x.hi)}</span></div><small>${fmt(x.pu.v)} / ${x.pu.l}</small></div></div>`}).join('')||'<p class="mu">Nothing here.</p>'}
-function prices(){return`<div class="sc"><table class="tb"><tr><th>Product</th><th>Low | High</th><th>Best / unit</th><th>Online (checked)</th></tr>${D.items.map(x=>`<tr><td>${esc(x.name)}</td><td><span class="lo">${fmt(x.lo)}</span> | <span class="hi">${fmt(x.hi)}</span></td><td>${fmt(x.pu.v)}<br><small>per ${x.pu.l}</small></td><td>${x.on?`${fmt(x.on.pr)}<br><small>${fmt(x.on.pu.v)} / ${x.on.pu.l}<br>${esc(x.on.d)}${x.on.s?' · '+esc(x.on.s):''}</small>`:'<small>not checked</small>'}</td></tr>`).join('')}</table></div>`}
-function hist(){const s=hq.toLowerCase();
- const r=D.M.filter(r=>r.disc==disc&&(!hprod||r.key==hprod.toLowerCase())&&(!s||[r.p,r.b,r.s,r.n,r.d].join(' ').toLowerCase().includes(s))).sort((a,b)=>cmp(b,a));
- return r.map(r=>{const p=up(r.pr,r.q,r.u);return`<div class="hrow"><div class="t"><b>${esc(r.p)}</b><b>${fmt(r.pr)}</b></div><div class="t"><small>${esc(r.d)} · ${r.q} ${esc(r.u)}${r.b?' · '+esc(r.b):''}</small><small>${fmt(p.v)} / ${p.l}</small></div><div class="t" style="margin-top:4px">${pill(r.s)}${r.disc?'<span class="dc">discounted</span>':''}${r.pend?'<span class="dc">not in sheet yet</span>':''}</div>${r.n?`<small>${esc(r.n)}</small>`:''}</div>`}).join('')||'<p class="mu">No purchases match.</p>'}
+function prices(){const s=pq.toLowerCase(),a=D.items.filter(x=>!s||x.name.toLowerCase().includes(s));
+ if(!a.length)return'<p class="mu">No products match.</p>';
+ return`<div class="sc"><table class="tb"><tr><th>Product</th><th>Low | High</th><th>Best / unit</th><th>Online (checked)</th></tr>${a.map(x=>`<tr data-open="${esc(x.key)}"><td>${esc(x.name)}</td><td><span class="lo">${fmt(x.lo)}</span> | <span class="hi">${fmt(x.hi)}</span></td><td>${fmt(x.pu.v)}<br><small>per ${x.pu.l}</small></td><td>${x.on?`${fmt(x.on.pr)}<br><small>${fmt(x.on.pu.v)} / ${x.on.pu.l}<br>${esc(x.on.d)}${x.on.s?' · '+esc(x.on.s):''}</small>`:'<small>not checked</small>'}</td></tr>`).join('')}</table></div>`}
+function hist(){const s=hq.toLowerCase(),hk=hprod.toLowerCase(),hit=a=>!s||a.join(' ').toLowerCase().includes(s);
+ const r=D.M.filter(r=>(!hk||r.key==hk)&&hit([r.p,r.b,r.s,r.n,r.d])).sort((a,b)=>cmp(b,a));
+ const o=D.O.filter(r=>(!hk||r.key==hk)&&hit([r.p,r.b,r.s,r.d])).sort((a,b)=>cmp(b,a));
+ const P=r.map(r=>{const p=up(r.pr,r.q,r.u);return`<div class="hrow"><div class="t"><b>${esc(r.p)}</b><b>${fmt(r.pr)}</b></div><div class="t"><small>${esc(r.d)} · ${r.q} ${esc(r.u)}${r.b?' · '+esc(r.b):''}</small><small>${fmt(p.v)} / ${p.l}</small></div><div class="t" style="margin-top:4px"><span>${pill(r.s)} ${r.disc?'<span class="dc">discounted</span>':'<span class="fp">full price</span>'}</span>${r.pend?'<span class="dc">not in sheet yet</span>':''}</div>${r.n?`<small>${esc(r.n)}</small>`:''}</div>`}).join('');
+ const Q=o.map(r=>{const p=up(r.pr,r.q,r.u);return`<div class="hrow"><div class="t"><b>${esc(r.p||r.key)}</b><b>${fmt(r.pr)}</b></div><div class="t"><small>${esc(r.d)} · ${r.q} ${esc(r.u)}${r.b?' · '+esc(r.b):''}</small><small>${fmt(p.v)} / ${p.l}</small></div><div class="t" style="margin-top:4px">${pill(r.s)}${r.pend?'<span class="dc">not in sheet yet</span>':''}</div></div>`}).join('');
+ return`<h3 class="sec">Purchases (${r.length})</h3>${P||'<p class="mu">No purchases match.</p>'}<h3 class="sec">Online prices checked (${o.length})</h3>${Q||'<p class="mu">No online prices checked yet.</p>'}`}
 function render(){ctl();$('#app').innerHTML={list,prices,hist}[tab]()}
 function sheet(h){$('#shw').innerHTML=h?`<div class="sh" id="bg"><div>${h}</div></div>`:''}
 function edit(k){const x=D.items.find(i=>i.key==k),l=L(k);
@@ -149,7 +155,7 @@ document.addEventListener('click',e=>{const t=e.target;
  const ck=t.closest('[data-ck]');if(ck){e.stopPropagation();const k=ck.dataset.ck;loc[k]={...L(k),ck:!L(k).ck};save();render();return}
  const ed=t.closest('[data-ed]');if(ed){edit(ed.dataset.ed);return}
  const op=t.closest('[data-open]');if(op){openHist(D.items.find(i=>i.key==op.dataset.open).name);return}
- const tb=t.closest('nav button');if(tb){tab=tb.dataset.t;render();scrollTo(0,0);return}
+ const tb=t.closest('nav button');if(tb){if(tb.dataset.t=='hist'&&tab!='hist')hprod='';tab=tb.dataset.t;render();scrollTo(0,0);return}
  if(t.id=='gear'||t.id=='pend')settings();
  if(t.id=='add')chooser();
  const f=t.closest('[data-fl]');if(f){fl=f.dataset.fl;render()}
@@ -159,7 +165,7 @@ document.addEventListener('click',e=>{const t=e.target;
  if(t.id=='clr'&&confirm('Uncheck everything?')){Object.keys(loc).forEach(k=>delete loc[k].ck);save();render()}});
 document.addEventListener('change',e=>{if(e.target.id=='so'){so=e.target.value;render()}});
 document.addEventListener('input',e=>{const t=e.target;
- if(t.id=='q'||t.id=='hq'){const p=t.selectionStart;t.id=='q'?q=t.value:hq=t.value;$('#app').innerHTML={list,hist}[tab]();}});
+ if(t.id=='q'||t.id=='hq'||t.id=='pq'){if(t.id=='q')q=t.value;else if(t.id=='hq')hq=t.value;else pq=t.value;$('#app').innerHTML={list,prices,hist}[tab]();}});
 build();render();sync();addEventListener('online',sync);
 if(!cfg.m&&!raw.m)settings();
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
