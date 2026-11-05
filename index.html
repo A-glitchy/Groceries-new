@@ -56,14 +56,15 @@ const up=(p,q,u)=>{const x=U[u]||[u||'unit',1];return{v:p/q*x[1],l:x[0]}};
 const cmp=(a,b)=>a.d<b.d?-1:a.d>b.d?1:a.i-b.i;
 function build(){
  const M=rows(raw.m).map((r,i)=>({i,p:r.Product,key:r.Product.toLowerCase(),b:r.Brand,s:r['Purchased at (store)'],d:r['Date purchased'],pr:+r['Price paid (toman)'],q:+r['Pack qty']||1,u:(r['Pack unit']||'').toLowerCase(),disc:/^y/i.test(r['Discounted?']),par:/^true$/i.test(r['For parents']),n:r.Notes})).filter(r=>r.pr>0);
- const O=rows(raw.o).map((r,i)=>({i,p:r.Product,b:r.Brand,key:r.Product.toLowerCase(),s:r.Store,d:r['Date checked'],pr:+r['Price (toman)'],q:+r['Pack qty']||1,u:(r['Pack unit']||'').toLowerCase()})).filter(r=>r.pr>0);
+ const O0=rows(raw.o).map((r,i)=>({i,p:r.Product,b:r.Brand,key:r.Product.toLowerCase(),s:r.Store,d:r['Date checked'],pr:+r['Price (toman)'],q:+r['Pack qty']||1,u:(r['Pack unit']||'').toLowerCase()}));
+ const O=O0.filter(r=>r.pr>0);
  const sig=(k,s,d,p)=>[k,s,d,p].map(v=>String(v??'').toLowerCase().trim()).join('|');
  if(M.length){const S=new Set([...M.map(r=>sig(r.key,r.s,r.d,r.pr)),...O.map(r=>sig(r.key,r.s,r.d,r.pr))]);const n=pend.length;pend=pend.filter(p=>!S.has(sig(p.r.p.toLowerCase(),p.r.s,p.r.d,p.r.pr)));if(pend.length!=n)LS.setItem('pend',JSON.stringify(pend))}
  pend.forEach((p,j)=>{const r=p.r,k=r.p.toLowerCase();if(p.t=='m')M.push({i:1e6+j,p:r.p,key:k,b:r.b,s:r.s,d:r.d,pr:r.pr,q:r.q,u:r.u,disc:!!r.disc,par:!!r.par,n:r.n,pend:1});else O.push({i:1e6+j,p:r.p,b:r.b,pend:1,key:k,s:r.s,d:r.d,pr:r.pr,q:r.q,u:r.u})});
  const g={};M.forEach(r=>(g[r.key]=g[r.key]||{key:r.key,name:r.p,rows:[]}).rows.push(r));
  const items=Object.values(g);
  const nm={};items.forEach(x=>nm[x.key]=1);
- [...O.map(r=>({key:r.key,name:r.p||r.key})),...cust.map(n=>({key:n.toLowerCase(),name:n}))].forEach(e=>{if(!nm[e.key]){nm[e.key]=1;items.push({key:e.key,name:e.name,rows:[],cust:cust.some(n=>n.toLowerCase()==e.key)})}});
+ [...O0.map(r=>({key:r.key,name:r.p||r.key})),...cust.map(n=>({key:n.toLowerCase(),name:n}))].forEach(e=>{if(!nm[e.key]){nm[e.key]=1;items.push({key:e.key,name:e.name,rows:[],cust:cust.some(n=>n.toLowerCase()==e.key)})}});
  items.forEach(x=>{x.rows.sort(cmp);const E=!x.rows.length;x.last=E?{b:'',s:'',q:1,u:'',d:'',i:0}:x.rows.at(-1);const pr=x.rows.map(r=>r.pr);x.lo=E?null:Math.min(...pr);x.hi=E?null:Math.max(...pr);
   const ps=x.rows.filter(r=>r.u==x.last.u).map(r=>up(r.pr,r.q,r.u));x.pu=E?null:ps.reduce((a,b)=>b.v<a.v?b:a);
   x.par=x.rows.some(r=>r.par);const o=O.filter(r=>r.key==x.key).sort(cmp).at(-1);
